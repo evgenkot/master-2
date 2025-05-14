@@ -1,0 +1,11 @@
+syntax = "proto3";
+package main;
+option go_package = "./datastruct";
+
+message ProtoDataStruct {
+    string string_field = 1;
+    int32 int_field = 2;
+    double float_field = 3;
+    repeated string array_field = 4;
+    map<string, int32> map_field = 5;
+}

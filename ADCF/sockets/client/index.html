@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+</head>
+<body>
+    <div id="chat"></div>
+    <input type="text" id="message" placeholder="Type message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        let ws;
+        let username = prompt("Enter your name:");
+        let room = prompt("Enter room name:");
+
+        function connect() {
+            ws = new WebSocket("ws://localhost:8080/ws");
+            
+            ws.onopen = () => {
+                ws.send(JSON.stringify({
+                    type: "join",
+                    from: username,
+                    room: room
+                }));
+            };
+
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                const chat = document.getElementById("chat");
+                switch(msg.type) {
+                    case "message":
+                        chat.innerHTML += `<p>${msg.from} [${msg.timestamp}]: ${msg.content}</p>`;
+                        break;
+                    case "system":
+                        chat.innerHTML += `<p style="color: gray;">[System] ${msg.content} [${msg.timestamp}]</p>`;
+                        break;
+                    case "user_list":
+                        chat.innerHTML += `<p>Users in room: ${msg.users.join(", ")}</p>`;
+                        break;
+                }
+            };
+
+            ws.onclose = () => {
+                console.log("Disconnected");
+            };
+        }
+
+        function sendMessage() {
+            const input = document.getElementById("message");
+            const message = {
+                type: "message",
+                from: username,
+                content: input.value,
+                room: room
+            };
+            ws.send(JSON.stringify(message));
+            input.value = "";
+        }
+
+        connect();
+    </script>
+</body>
+</html>
