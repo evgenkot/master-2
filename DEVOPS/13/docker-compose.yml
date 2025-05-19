@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: ./api
+    environment:
+      - GIN_MODE=release
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
+  web:
+    build:
+      context: ./web
+    ports:
+      - "8888:80"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+

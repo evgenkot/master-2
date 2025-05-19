@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Anecdotes</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 1rem; }
+    .anecdote { border: 1px solid #ddd; padding: 0.5rem; margin-bottom: 0.5rem; }
+    .buttons button { margin-right: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Anecdotes</h1>
+  <div id="list">Загрузка…</div>
+
+  <script>
+    const apiUrl = '/api/anecdotes';
+
+    async function fetchAnecdotes() {
+      const res = await fetch(apiUrl);
+      const arr = await res.json();
+      const container = document.getElementById('list');
+      container.innerHTML = arr.map(a => `
+        <div class="anecdote">
+          <h2>${a.title}</h2>
+          <p>${a.text}</p>
+          <p>👍 ${a.likes}  👎 ${a.dislikes}</p>
+          <div class="buttons">
+            <button onclick="vote(${a.id}, 'like')">Like</button>
+            <button onclick="vote(${a.id}, 'dislike')">Dislike</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function vote(id, type) {
+      await fetch(`/api/anecdotes/${id}/${type}`, { method: 'POST' });
+      fetchAnecdotes();
+    }
+
+    fetchAnecdotes();
+  </script>
+</body>
+</html>
+
